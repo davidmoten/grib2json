@@ -39,96 +39,100 @@ import ucar.unidata.io.RandomAccessFile;
  */
 public final class Grib2Json {
 
-    private static final Logger log = LoggerFactory.getLogger(Grib2Json.class);
+	private static final Logger log = LoggerFactory.getLogger(Grib2Json.class);
 
-    private final File file;
-    private final List<Options> optionGroups;
+	private final File file;
+	private final List<Options> optionGroups;
 
-    private final OutputStream json;
+	private final OutputStream json;
 
-    public Grib2Json(File file, List<Options> optionGroups, OutputStream json) {
-        this.json = json;
-        if (!file.exists()) {
-            throw new IllegalArgumentException("Cannot find input file: " + file);
-        }
-        this.file = file;
-        this.optionGroups = optionGroups;
-    }
+	public Grib2Json(File file, List<Options> optionGroups) {
+		this(file, optionGroups, null);
+	}
 
-    private JsonGenerator newJsonGenerator(Options options) throws IOException {
-        JsonGeneratorFactory jgf = Json.createGeneratorFactory(
-                options.isCompactFormat() ? null : singletonMap(JsonGenerator.PRETTY_PRINTING, true));
-        OutputStream output;
-        if (json != null) {
-            output = json;
-        } else {
-            output = options.getOutput() != null
-                    ? new BufferedOutputStream(new FileOutputStream(options.getOutput(), false))
-                    : System.out;
-        }
+	public Grib2Json(File file, List<Options> optionGroups, OutputStream json) {
+		this.json = json;
+		if (!file.exists()) {
+			throw new IllegalArgumentException("Cannot find input file: " + file);
+		}
+		this.file = file;
+		this.optionGroups = optionGroups;
+	}
 
-        return jgf.createGenerator(output);
-    }
+	private JsonGenerator newJsonGenerator(Options options) throws IOException {
+		JsonGeneratorFactory jgf = Json.createGeneratorFactory(
+				options.isCompactFormat() ? null : singletonMap(JsonGenerator.PRETTY_PRINTING, true));
+		OutputStream output;
+		if (json != null) {
+			output = json;
+		} else {
+			output = options.getOutput() != null
+					? new BufferedOutputStream(new FileOutputStream(options.getOutput(), false))
+					: System.out;
+		}
 
-    private void write(RandomAccessFile raf, Grib2Input input, Options options) throws IOException {
-        JsonGenerator jg = newJsonGenerator(options);
-        jg.writeStartArray();
+		return jgf.createGenerator(output);
+	}
 
-        List<Grib2Record> records = input.getRecords();
-        for (Grib2Record record : records) {
-            GribRecordWriter rw = new GribRecordWriter(jg, record, options);
-            if (rw.isSelected()) {
-                jg.writeStartObject();
-                rw.writeHeader();
-                if (options.getPrintData()) {
-                    rw.writeData(new Grib2Data(raf));
-                }
-                jg.writeEnd();
-            }
-        }
+	private void write(RandomAccessFile raf, Grib2Input input, Options options) throws IOException {
+		JsonGenerator jg = newJsonGenerator(options);
+		jg.writeStartArray();
 
-        jg.writeEnd();
-        jg.close();
-    }
+		List<Grib2Record> records = input.getRecords();
+		for (Grib2Record record : records) {
+			GribRecordWriter rw = new GribRecordWriter(jg, record, options);
+			if (rw.isSelected()) {
+				jg.writeStartObject();
+				rw.writeHeader();
+				if (options.getPrintData()) {
+					rw.writeData(new Grib2Data(raf));
+				}
+				jg.writeEnd();
+			}
+		}
 
-    private void write(NetcdfFile netcdfFile, Options options) throws IOException {
-        JsonGenerator jg = newJsonGenerator(options);
-        jg.writeStartArray();
+		jg.writeEnd();
+		jg.close();
+	}
 
-        int days = netcdfFile.findVariable("time").readScalarInt();
-        DateTime date = new DateTime(1992, 10, 5, 0, 0, DateTimeZone.UTC).plusDays(days);
-        double depth = netcdfFile.findVariable("depth").readScalarDouble();
+	private void write(NetcdfFile netcdfFile, Options options) throws IOException {
+		JsonGenerator jg = newJsonGenerator(options);
+		jg.writeStartArray();
 
-        new OscarRecordWriter(jg, netcdfFile.findVariable("u"), date, depth, options).writeRecord();
-        new OscarRecordWriter(jg, netcdfFile.findVariable("v"), date, depth, options).writeRecord();
+		int days = netcdfFile.findVariable("time").readScalarInt();
+		DateTime date = new DateTime(1992, 10, 5, 0, 0, DateTimeZone.UTC).plusDays(days);
+		double depth = netcdfFile.findVariable("depth").readScalarDouble();
 
-        jg.writeEnd();
-        jg.close();
-    }
+		new OscarRecordWriter(jg, netcdfFile.findVariable("u"), date, depth, options).writeRecord();
+		new OscarRecordWriter(jg, netcdfFile.findVariable("v"), date, depth, options).writeRecord();
 
-    /**
-     * Convert the input file to Json as specified by the command line options.
-     */
-    public void write() throws IOException {
+		jg.writeEnd();
+		jg.close();
+	}
 
-        // Try opening the file as GRIB format.
-        RandomAccessFile raf = new RandomAccessFile(file.getPath(), "r");
-        raf.order(RandomAccessFile.BIG_ENDIAN);
-        Grib2Input input = new Grib2Input(raf);
-        if (input.scan(false, false)) {
-            for (Options options : optionGroups) {
-                write(raf, input, options);
-            }
-            raf.close();
-        } else {
-            raf.close();
+	/**
+	 * Convert the input file to Json as specified by the command line options.
+	 */
+	public void write() throws IOException {
 
-            // Otherwise, process it as NetCDF format.
-            NetcdfFile netcdfFile = NetcdfFile.open(file.getPath());
-            log.info("File contents:\n{}", netcdfFile);
-            for (Options options : optionGroups) {
-                write(netcdfFile, options);
-            }
-        }
-    }
+		// Try opening the file as GRIB format.
+		RandomAccessFile raf = new RandomAccessFile(file.getPath(), "r");
+		raf.order(RandomAccessFile.BIG_ENDIAN);
+		Grib2Input input = new Grib2Input(raf);
+		if (input.scan(false, false)) {
+			for (Options options : optionGroups) {
+				write(raf, input, options);
+			}
+			raf.close();
+		} else {
+			raf.close();
+
+			// Otherwise, process it as NetCDF format.
+			NetcdfFile netcdfFile = NetcdfFile.open(file.getPath());
+			log.info("File contents:\n{}", netcdfFile);
+			for (Options options : optionGroups) {
+				write(netcdfFile, options);
+			}
+		}
+	}
 }
