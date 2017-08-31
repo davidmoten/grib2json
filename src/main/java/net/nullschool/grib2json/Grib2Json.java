@@ -1,28 +1,39 @@
 package net.nullschool.grib2json;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import ucar.grib.grib2.*;
-import ucar.nc2.NetcdfFile;
-import ucar.unidata.io.RandomAccessFile;
+import static java.util.Collections.singletonMap;
+
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.List;
 
 import javax.json.Json;
 import javax.json.stream.JsonGenerator;
 import javax.json.stream.JsonGeneratorFactory;
-import java.io.*;
-import java.util.*;
 
-import static java.util.Collections.*;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ucar.grib.grib2.Grib2Data;
+import ucar.grib.grib2.Grib2Input;
+import ucar.grib.grib2.Grib2Record;
+import ucar.nc2.NetcdfFile;
+import ucar.unidata.io.RandomAccessFile;
 
 /**
- * 2013-10-25<p/>
+ * 2013-10-25
+ * <p/>
  *
- * Converts a GRIB2 file to Json. GRIB2 decoding is performed by the netCDF-Java GRIB decoder.
+ * Converts a GRIB2 file to Json. GRIB2 decoding is performed by the netCDF-Java
+ * GRIB decoder.
  *
- * This class was initially based on Grib2Dump, part of the netCDF-Java library written by University
- * Corporation for Atmospheric Research/Unidata. However, what appears below is a complete rewrite.
+ * This class was initially based on Grib2Dump, part of the netCDF-Java library
+ * written by University Corporation for Atmospheric Research/Unidata. However,
+ * what appears below is a complete rewrite.
  *
  * @author Cameron Beccario
  */
@@ -30,11 +41,13 @@ public final class Grib2Json {
 
     private static final Logger log = LoggerFactory.getLogger(Grib2Json.class);
 
-
     private final File file;
     private final List<Options> optionGroups;
 
-    public Grib2Json(File file, List<Options> optionGroups) {
+    private final OutputStream json;
+
+    public Grib2Json(File file, List<Options> optionGroups, OutputStream json) {
+        this.json = json;
         if (!file.exists()) {
             throw new IllegalArgumentException("Cannot find input file: " + file);
         }
@@ -43,15 +56,16 @@ public final class Grib2Json {
     }
 
     private JsonGenerator newJsonGenerator(Options options) throws IOException {
-        JsonGeneratorFactory jgf =
-            Json.createGeneratorFactory(
-                options.isCompactFormat() ?
-                    null :
-                    singletonMap(JsonGenerator.PRETTY_PRINTING, true));
-
-        OutputStream output = options.getOutput() != null ?
-            new BufferedOutputStream(new FileOutputStream(options.getOutput(), false)) :
-            System.out;
+        JsonGeneratorFactory jgf = Json.createGeneratorFactory(
+                options.isCompactFormat() ? null : singletonMap(JsonGenerator.PRETTY_PRINTING, true));
+        OutputStream output;
+        if (json != null) {
+            output = json;
+        } else {
+            output = options.getOutput() != null
+                    ? new BufferedOutputStream(new FileOutputStream(options.getOutput(), false))
+                    : System.out;
+        }
 
         return jgf.createGenerator(output);
     }
@@ -106,8 +120,7 @@ public final class Grib2Json {
                 write(raf, input, options);
             }
             raf.close();
-        }
-        else {
+        } else {
             raf.close();
 
             // Otherwise, process it as NetCDF format.

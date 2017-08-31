@@ -72,7 +72,7 @@ class Launcher {
                 readRecipeFile(args, options.getRecipe()) :
                 Collections.singletonList(options);
 
-            new Grib2Json(options.getFile(), optionGroups).write();
+            new Grib2Json(options.getFile(), optionGroups, null).write();
         }
         catch (JewelRuntimeException t) {
             printUsage();
