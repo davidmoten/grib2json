@@ -26,14 +26,6 @@
         </license>
     </licenses>
 
-    <developers>
-        <developer>
-            <id>cambecc</id>
-            <name>Cameron Beccario</name>
-            <email>davidmoten@nullschool.net</email>
-        </developer>
-    </developers>
-
     <scm>
         <connection>scm:git:git@github.com:davidmoten/grib2json.git</connection>
         <developerConnection>scm:git:git@github.com:davidmoten/grib2json.git</developerConnection>
