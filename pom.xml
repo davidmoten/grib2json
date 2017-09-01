@@ -14,7 +14,7 @@
     <packaging>jar</packaging>
 
     <name>grib2json</name>
-    <description>GRIB to JSON converter</description>
+    <description>GRIB to JSON converter - forked by Dave Moten</description>
     <url>https://github.com/davidmoten/grib2json</url>
     <inceptionYear>2013</inceptionYear>
 
