@@ -26,7 +26,7 @@ import ucar.unidata.io.RandomAccessFile;
 
 /**
  * 2013-10-25
- * <p/>
+ * <p>
  *
  * Converts a GRIB2 file to Json. GRIB2 decoding is performed by the netCDF-Java
  * GRIB decoder.
@@ -112,6 +112,8 @@ public final class Grib2Json {
 
 	/**
 	 * Convert the input file to Json as specified by the command line options.
+     * 
+	 * @throws IOException if something went wrong with IO (reading or writing)
 	 */
 	public void write() throws IOException {
 
