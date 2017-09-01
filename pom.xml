@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>grib2json</artifactId>
-    <version>0.8.0.3</version>
+    <version>0.8.0.4-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>grib2json</name>
@@ -30,7 +30,7 @@
         <connection>${scm.url}</connection>
         <developerConnection>${scm.url}</developerConnection>
         <url>${scm.url}</url>
-        <tag>0.8.0.3</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <properties>
