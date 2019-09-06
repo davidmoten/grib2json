@@ -19,7 +19,7 @@ Add this dependency to your pom.xml:
   <version>VERSION_HERE</version>
 </dependency>
 ```
-See [releases](releases) for the latest version number.
+See [releases](../../releases) for the latest version number.
 
 How to build
 ------------
