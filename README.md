@@ -6,7 +6,7 @@ A command line utility that decodes [GRIB2](http://en.wikipedia.org/wiki/GRIB) f
 This utility uses the netCDF-Java GRIB decoder, part of the [THREDDS](https://github.com/Unidata/thredds) project
 by University Corporation for Atmospheric Research/Unidata.
 
-This project is a fork that publishes to Maven Central using the com.github.davidmoten groupId.
+This project is a fork that publishes the jar and the tar.gz to Maven Central using the *com.github.davidmoten* groupId.
 
 Getting started
 ----------------
@@ -31,6 +31,7 @@ mvn clean install
 
 Usage
 -----
+There are two main usage paths. One is to call java classes using the jar and the other is to use the launch script inside the tar.gz artifact. To use the launch script explode the tar.gz to a folder.
 
 The `grib2json` launch script is located in the `bin` directory and requires the `JAVA_HOME` environment
 variable to be defined.
