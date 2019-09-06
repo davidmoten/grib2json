@@ -6,15 +6,27 @@ A command line utility that decodes [GRIB2](http://en.wikipedia.org/wiki/GRIB) f
 This utility uses the netCDF-Java GRIB decoder, part of the [THREDDS](https://github.com/Unidata/thredds) project
 by University Corporation for Atmospheric Research/Unidata.
 
-Installation
+This project is a fork that publishes to Maven Central using the com.github.davidmoten groupId.
+
+Getting started
+----------------
+Add this dependency to your pom.xml:
+
+```xml
+<dependency>
+  <groupId>com.github.davidmoten</groupId>
+  <artifactId>grib2json</artifactId>
+  <version>VERSION_HERE</version>
+</dependency>
+```
+
+How to build
 ------------
 
 ```
 git clone <this project>
-mvn package
+mvn clean install 
 ```
-
-This creates a .tar.gz in the target directory. Unzip and untar the package in a location of choice.
 
 Usage
 -----
