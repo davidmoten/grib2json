@@ -1,12 +1,21 @@
 package net.nullschool.grib2json;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Collections;
+
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.stream.JsonParser;
 
 import org.junit.Test;
 
@@ -89,8 +98,16 @@ public class Grib2JsonTest {
 		new Grib2Json(t, Collections.singletonList(options)).write();
 		System.out.println("input file size grb2  = "+ grib.length());
 		System.out.println("output file size json = " + output.length());
-		String json = new String(Files.readAllBytes(output.toPath()), StandardCharsets.UTF_8);
-		assertTrue(json.contains("\"disciplineName\": \"Meteorological products\""));
+		try (Reader r = new BufferedReader(new InputStreamReader(new FileInputStream(output), StandardCharsets.UTF_8))) {
+		    JsonParser parser = Json.createParser(r);
+		    parser.next();
+		    JsonArray a = parser.getArray();
+		    JsonObject b = a.getJsonObject(0);
+		    JsonObject c = b.getJsonObject("header");
+		    assertEquals(245889, c.getInt("gribLength"));
+		    JsonArray d = b.getJsonArray("data");
+		    assertEquals(-0.84, d.getJsonNumber(0).doubleValue(), 0.0001);
+		}
 	}
 
 }
