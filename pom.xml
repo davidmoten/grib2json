@@ -71,7 +71,7 @@
         <dependency>
             <groupId>edu.ucar</groupId>
             <artifactId>grib</artifactId>
-            <version>4.3.23</version>
+            <version>4.5.5</version>
         </dependency>
 
         <dependency>
