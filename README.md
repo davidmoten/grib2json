@@ -1,6 +1,6 @@
 # grib2json
 <a href="https://github.com/davidmoten/grib2json/actions/workflows/ci.yml"><img src="https://github.com/davidmoten/grib2json/actions/workflows/ci.yml/badge.svg"/></a><br/>
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davidmoten/grib2json-runtime/badge.svg?style=flat)](https://maven-badges.herokuapp.com/maven-central/com.github.davidmoten/grib2json)<br/>
+[![Maven Central](https://maven-badges.sml.io/sonatype-central/com.github.davidmoten/grib2json-runtime/badge.svg?style=flat)](https://maven-badges.sml.io/sonatype-central/com.github.davidmoten/grib2json)<br/>
 [![codecov](https://codecov.io/gh/davidmoten/grib2json/branch/master/graph/badge.svg)](https://codecov.io/gh/davidmoten/grib2json)<br/>
 
 A command line utility that decodes [GRIB2](http://en.wikipedia.org/wiki/GRIB) files as JSON.
